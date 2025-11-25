@@ -34,7 +34,7 @@
 
 - **UVM architecture diagram**
     
-    ![image.png](attachment:4bbb5e50-067d-4470-9f70-148e8b968bb7:image.png)
+    ![alt text](./docs/uvm_diagram.png)
     
     - This project basically follows this structure.
     

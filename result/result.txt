@@ -1,0 +1,58 @@
+@      0: [RNTST] Running test adder_test...
+@      0: [BASE_TEST] Build phase started.
+@      0: [ADDER_TEST] Build phase started.
+@      0: [ENV] Build phase started.
+@      0: [ENV] All components successfully created
+@      0: [AGENT] Build phase started.
+@      0: [SEQUENCER] Created uvm_test_top.env.agent.seqr
+@      0: [AGENT] Connect phase started.
+@      0: [ENV] Connect phase started.
+@      0: [Questa UVM] End Of Elaboration
+@      0: [ADDER_TEST] Run phase started.
+@      0: [ADDER_TEST] Starting adder_seq on env.agent.seqr
+@      0: [MONITOR] Monitor started.
+@      0: [DRIVER] Driver started.
+@      0: [SEQ] Start transaction # 1
+@   5001: [MONITOR] RESET asserted.
+@  15000: [DRIVER] Reset deasserted.
+@  25000: [SEQ] Generated: a = 241, b = 11
+@  65001: [MONITOR]  Handshake captured: a = 241, b = 11, sum = 252
+@  65001: [REF_MODEL] REF_MODEL: a = 241, b = 11, sum = 252
+@  65001: [SCOREBOARD] REF pushed: a = 241, b = 11, sum = 252, exp_q size = 1
+@  65001: [SCOREBOARD] DUT got: a = 241, b = 11, sum = 252
+@  65001: [SCOREBOARD] Match OK: a = 241, b = 11, sum = 252; Total matches = 1
+@  75000: [DRIVER] Driver done: a = 241, b = 11, sum = 0
+@  75000: [SEQ] Start transaction # 2
+@  75000: [SEQ] Generated: a = 91, b = 92
+@ 125001: [MONITOR]  Handshake captured: a = 91, b = 92, sum = 183
+@ 125001: [REF_MODEL] REF_MODEL: a = 91, b = 92, sum = 183
+@ 125001: [SCOREBOARD] REF pushed: a = 91, b = 92, sum = 183, exp_q size = 1
+@ 125001: [SCOREBOARD] DUT got: a = 91, b = 92, sum = 183
+@ 125001: [SCOREBOARD] Match OK: a = 91, b = 92, sum = 183; Total matches = 2
+@ 135000: [DRIVER] Driver done: a = 91, b = 92, sum = 0
+@ 135000: [SEQ] Start transaction # 3
+@ 135000: [SEQ] Generated: a = 145, b = 105
+@ 185001: [MONITOR]  Handshake captured: a = 145, b = 105, sum = 250
+@ 185001: [REF_MODEL] REF_MODEL: a = 145, b = 105, sum = 250
+@ 185001: [SCOREBOARD] REF pushed: a = 145, b = 105, sum = 250, exp_q size = 1
+@ 185001: [SCOREBOARD] DUT got: a = 145, b = 105, sum = 250
+@ 185001: [SCOREBOARD] Match OK: a = 145, b = 105, sum = 250; Total matches = 3
+@ 195000: [DRIVER] Driver done: a = 145, b = 105, sum = 0
+@ 195000: [SEQ] Start transaction # 4
+@ 195000: [SEQ] Generated: a = 16, b = 138
+@ 245001: [MONITOR]  Handshake captured: a = 16, b = 138, sum = 154
+@ 245001: [REF_MODEL] REF_MODEL: a = 16, b = 138, sum = 154
+@ 245001: [SCOREBOARD] REF pushed: a = 16, b = 138, sum = 154, exp_q size = 1
+@ 245001: [SCOREBOARD] DUT got: a = 16, b = 138, sum = 154
+@ 245001: [SCOREBOARD] Match OK: a = 16, b = 138, sum = 154; Total matches = 4
+@ 255000: [DRIVER] Driver done: a = 16, b = 138, sum = 0
+@ 255000: [SEQ] Start transaction # 5
+@ 255000: [SEQ] Generated: a = 254, b = 0
+@ 305001: [MONITOR]  Handshake captured: a = 254, b = 0, sum = 254
+@ 305001: [REF_MODEL] REF_MODEL: a = 254, b = 0, sum = 254
+@ 305001: [SCOREBOARD] REF pushed: a = 254, b = 0, sum = 254, exp_q size = 1
+@ 305001: [SCOREBOARD] DUT got: a = 254, b = 0, sum = 254
+@ 305001: [SCOREBOARD] Match OK: a = 254, b = 0, sum = 254; Total matches = 5
+@ 315000: [DRIVER] Driver done: a = 254, b = 0, sum = 0
+@ 315000: [ADDER_TEST] Run phase completed.
+@ 315000: [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase

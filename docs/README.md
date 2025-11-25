@@ -34,7 +34,7 @@
 
 - **UVM architecture diagram**
     
-    ![alt text](./docs/uvm_diagram.png)
+    ![alt text](https://github.com/ChenTungChu/8_bit_Adder_with_UVM_1.2_Verification/blob/main/docs/uvm_diagram.png)
     
     - This project basically follows this structure.
     

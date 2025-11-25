@@ -1,0 +1,82 @@
+<certe_dump>
+  <instance type=" adder_test "> 
+     uvm_test_top 
+  
+     <instance type=" adder_env "> 
+        env 
+  
+        <instance type=" adder_agent "> 
+           agent 
+  
+           <instance type=" adder_driver "> 
+              drv 
+  
+              <port if_type = "uvm_analysis_port" txn_type = "anonymous"> 
+                 rsp_port 
+              </port> 
+  
+              <port if_type = "uvm_seq_item_pull_port" txn_type = "anonymous"> 
+                 seq_item_port 
+                 <connection>  uvm_test_top.env.agent.seqr.seq_item_export  </connection> 
+              </port> 
+           </instance> 
+  
+  
+           <instance type=" adder_monitor "> 
+              mon 
+  
+              <port if_type = "uvm_analysis_port" txn_type = "anonymous"> 
+                 ap 
+                 <connection>  uvm_test_top.env.refm.in_imp  </connection> 
+                 <connection>  uvm_test_top.env.scb.dut_export  </connection> 
+              </port> 
+           </instance> 
+  
+  
+           <instance type=" adder_sequencer "> 
+              seqr 
+  
+              <export if_type = "uvm_analysis_export" txn_type = "anonymous"> 
+                 rsp_export 
+                 <connection>  uvm_test_top.env.agent.seqr.sqr_rsp_analysis_fifo.analysis_export  </connection> 
+              </export> 
+  
+              <imp if_type = "uvm_seq_item_pull_imp" txn_type = "anonymous"> 
+                 seq_item_export 
+              </imp> 
+           </instance> 
+  
+        </instance> 
+  
+  
+        <instance type=" adder_ref "> 
+           refm 
+  
+           <imp if_type = "uvm_analysis_imp" txn_type = "anonymous"> 
+              in_imp 
+           </imp> 
+  
+           <port if_type = "uvm_analysis_port" txn_type = "anonymous"> 
+              out_port 
+              <connection>  uvm_test_top.env.scb.ref_export  </connection> 
+           </port> 
+        </instance> 
+  
+  
+        <instance type=" adder_scoreboard "> 
+           scb 
+  
+           <imp if_type = "uvm_analysis_imp_dut" txn_type = "anonymous"> 
+              dut_export 
+           </imp> 
+  
+           <imp if_type = "uvm_analysis_imp_ref" txn_type = "anonymous"> 
+              ref_export 
+           </imp> 
+        </instance> 
+  
+     </instance> 
+  
+  </instance> 
+  
+  </certe_dump>

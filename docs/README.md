@@ -1,192 +1,183 @@
-🧩 一、整體架構概覽
+# 8-bit Adder with UVM 1.2 Verification
 
-你的專案是一個典型的 UVM Testbench Hierarchy：
+## Introduction
 
-uvm_test_top
-└── env (adder_env)
-    └── agent (adder_agent)
-        ├── sequencer (adder_sequencer)
-        ├── driver (adder_driver)
-        └── monitor (adder_monitor)
-└── scoreboard (adder_scoreboard)
-└── reference model (adder_ref_model)
+---
 
+- This project implements an 8-bit adder module that follows a valid/ready handshake protocol. It contains a complete UVM (Universal Verification Methodology) 1.2 verification environment.
+- The DUT (Design Under Test), implemented a simple 8-bit adder, contains four states, with handshake signals to verify functional correctness, timing behavior, and protocol compliance.
+- The UVM verification environment includes all major UVM components (driver, monitor, scoreboard… etc.), forming a fully closed-loop verification flow.
+- The main goal of the project is to get familiar with the implementation and verification using UVM.
 
-所有這些元件由 adder_test（繼承自 uvm_test）啟動並管理。
-整個模擬會經歷一系列固定的 UVM Phase。
+## DUT
 
-🚀 二、UVM Simulation Phases 對照說明
-1️⃣ Build Phase（建構階段）
+---
 
-日誌：
+- **Functionality**
+    - Handshake-based adder is simulated so that state transitions determine when it receives input and when it outputs data
+- **Main signals**
+    - `in_valid`, `in_ready` : Handshake at input stage
+    - `out_valid`, `out_ready` : Handshake at output stage
+    - `sum` : Result sum
+- **FSM**
+    
+    
+    | State | Action | Next State |
+    | --- | --- | --- |
+    | IDLE | Wait for `in_valid` | CALC |
+    | CALC | Add calculation | WAIT |
+    | WAIT | Wait for `out_ready` | DONE |
+    | DONE | Clear sum and back to IDLE | IDLE |
 
-@      0: [BASE_TEST] Build phase started.
-@      0: [ADDER_TEST] Build phase started.
-@      0: [ENV] Build phase started.
-@      0: [ENV] All components successfully created
-@      0: [AGENT] Build phase started.
-@      0: [SEQUENCER] Created uvm_test_top.env.agent.seqr
+## UVM Environment Overview
 
-✳️ 做了什麼：
+---
 
-UVM 自動呼叫每個 component 的 build_phase()。
+- **UVM architecture diagram**
+    
+    ![image.png](attachment:4bbb5e50-067d-4470-9f70-148e8b968bb7:image.png)
+    
+    - This project basically follows this structure.
+    
+     
+    
+- **Overall hierarchy**
+    
+    ```
+    uvm_test_top
+     └── env (adder_env)
+          ├── agent (adder_agent)
+          │    ├── driver (adder_driver)
+          │    ├── monitor (adder_monitor)
+          │    └── sequencer (adder_sequencer)
+          ├── scoreboard (adder_scoreboard)
+          └── ref_model (adder_ref_model)
+    ```
+    
 
-各層在這階段 創建（create）子組件。
+## UVM Execution Flow
 
-通常使用：
+---
 
-driver = adder_driver::type_id::create("driver", this);
+### 1. Build phase
 
+- Create all uvm_components instances
+- Set up virtual interface
+- Example log:
+    
+    ```
+    @ 0: [ENV] All components successfully created
+    ```
+    
 
-env 建立 agent、scoreboard、ref_model。
+### 2. Connect phase
 
-agent 再建立 driver、monitor、sequencer。
+- Connect `seq_item_port` with `seq_item_export` and `analysis_port`
+    - Driver ↔ Sequencer
+    - Monitor → Scoreboard
+    - Reference Model → Scoreboard
 
-🧠 重點理解：
-UVM 採用 factory pattern，建構階段是用來決定哪些元件會被實例化、以何種型態建立。
+### 3. Run phase
 
-2️⃣ Connect Phase（連接階段）
+**(1)  `adder_driver`**
 
-日誌：
+- Receive transaction from `sequence`
+- Wait for  `in_ready` , and then send out `in_valid`, `a` , and `b`
+- After handshake, disable `in_valid`
+- Finish one transaction and inform sequencer
+- Example driver log
+    
+    ```
+    @  15000: [DRIVER] Reset deasserted.
+    @  75000: [DRIVER] Driver done: a = 241, b = 11, sum = 0
+    ```
+    
 
-@      0: [AGENT] Connect phase started.
-@      0: [ENV] Connect phase started.
+ **(2) `adder_monitor`**
 
-✳️ 做了什麼：
+- Monitor handshake signals
+- Capture data when `out_valid && out_ready`
+- Write the result (sum) to analysis port through `adder_seq_item`
+- Example monitor log
+    
+    ```
+    @  65001: [MONITOR] Handshake captured: a = 241, b = 11, sum = 252
+    ```
+    
 
-主要用來連接各元件之間的 TLM port/export：
+**(3) `adder_ref_model`**
 
-driver.seq_item_port.connect(sequencer.seq_item_export);
-monitor.ap.connect(scoreboard.analysis_export);
-ref_model.ap.connect(scoreboard.ref_export);
+- Software model that calculates the expected result
+    - This project uses simple model written in SystemVerilog
+- Send the expected result to scoreboard
+- Example reference model log
+    
+    ```
+    @  65001: [REF_MODEL] REF_MODEL: a = 241, b = 11, sum = 252
+    ```
+    
 
+**(4) `adder_scoreboard`**
 
-🧠 重點理解：
+- Collect DUT and REF_MODEL outputs
+- Compare if the outputs match
+    - If match: Record total matches
+    - If not match: Report error
+- Example scoreboard log with successful match
+    
+    ```
+    @  65001: [SCOREBOARD] Match OK: a = 241, b = 11, sum = 252; Total matches = 1
+    ```
+    
 
-這一步讓資料可以「流動」起來。
-例如：
+**(5) `adder_seq`**
 
-sequencer 把 sequence item 傳給 driver
+- Generate random input vectors
+- Send multiple transactions to driver
+- Example sequence log
+    
+    ```
+    @  25000: [SEQ] Generated: a = 241, b = 11
+    ```
+    
 
-monitor 把 DUT 輸出送給 scoreboard
+## Verification Results
 
-ref_model 把期望值送給 scoreboard
+---
 
-還沒有任何模擬時間進行（都是 @0 時間點）。
+- Repeat five iterations, all passed without error, DUT results match with reference model perfectly
+- Outputs of one successful verification
+    
+    ```
+    @ 65001: [MONITOR] Handshake captured: a = 241, b = 11, sum = 252
+    @ 65001: [REF_MODEL] REF_MODEL: a = 241, b = 11, sum = 252
+    @ 65001: [SCOREBOARD] Match OK: a = 241, b = 11, sum = 252; Total matches = 1
+    ```
+    
+- Complete results are in the result folder
 
-3️⃣ End of Elaboration
-@      0: [Questa UVM] End Of Elaboration
+## Conclusion
 
+---
 
-這是建構和連接都完成後的一個 checkpoint，代表 testbench hierarchy 都準備好了。
-此時可用 uvm_top.print_topology() 來檢查整體層級。
+- This project fully demonstrated:
+    - Layered and structured verification using UVM.
+    - Robust handshake protocol and synchronous logic.
+    - Interaction among the Driver, Monitor, and Scoreboard.
+    - A reusable and scalable verification environment architecture.
+- Verification results show that all the transaction match successfully, indicating that the verification environment is correctly designed and stable.
 
-4️⃣ Run Phase（模擬執行階段）
-@      0: [ADDER_TEST] Run phase started.
-@      0: [ADDER_TEST] Starting adder_seq on env.agent.seqr
+### Future Work
 
-✳️ 做了什麼：
+---
 
-這是 唯一有時間流動的階段。
-各個元件在 run_phase() 中各自執行：
-
-元件	工作內容
-sequencer	提供 transaction 給 driver
-driver	依序發出 stimulus 給 DUT，控制 valid/ready 等握手
-monitor	監看 DUT 介面信號並產生實際輸出 transaction
-ref_model	計算理論上的正確結果
-scoreboard	收到 DUT 實際結果與 REF 結果，進行比對
-⚙️ 三、你的模擬輸出解讀
-
-以下逐段解釋你的 log：
-
-▶ 1. Reset 階段
-@   5001: [MONITOR] RESET asserted.
-@  15000: [DRIVER] Reset deasserted.
-
-
-Monitor 偵測 reset 啟動，driver 之後解除 reset。
-這代表你的 testbench 在 run phase 初期，先等待 DUT ready。
-
-▶ 2. 第一筆 transaction
-@  25000: [SEQ] Generated: a = 241, b = 11
-@  65001: [MONITOR]  Handshake captured: a = 241, b = 11, sum = 252
-@  65001: [REF_MODEL] REF_MODEL: a = 241, b = 11, sum = 252
-@  65001: [SCOREBOARD] REF pushed: ...
-@  65001: [SCOREBOARD] DUT got: ...
-@  65001: [SCOREBOARD] Match OK: ...
-
-
-流程如下：
-
-Sequencer 產生 input transaction（a=241, b=11）。
-
-Driver 將該資料送入 DUT。
-
-Monitor 偵測握手完成，捕捉實際輸出 sum=252。
-
-Ref model 同時計算理論 sum（也=252）。
-
-Scoreboard 收到雙方資料 → 比對 → 結果 Match。
-
-這是一個完整的 data flow。
-
-▶ 3. 後續 transaction
-
-每一筆都重複上述流程：
-
-#2: a=91, b=92 → sum=183
-#3: a=145, b=105 → sum=250
-#4: a=16, b=138 → sum=154
-#5: a=254, b=0 → sum=254
-
-
-每次都成功 match，表示你的整個 testbench pipeline（driver→DUT→monitor→scoreboard）都正確。
-
-▶ 4. 結尾
-@ 315000: [ADDER_TEST] Run phase completed.
-@ 315000: [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
-
-
-代表模擬順利結束。
-之後 UVM 還會進入（可選的）：
-
-extract_phase（收集統計）
-
-check_phase（檢查錯誤）
-
-report_phase（印最終報告）
-
-🧠 四、整體運作流程圖
-               ┌────────────────────────┐
-               │        adder_seq       │
-               └────────────┬───────────┘
-                            │ (sequence item)
-                            ▼
-               ┌────────────────────────┐
-               │      adder_sequencer   │
-               └────────────┬───────────┘
-                            │
-                            ▼
-               ┌────────────────────────┐
-               │       adder_driver     │──► 驅動 DUT 接口信號
-               └────────────┬───────────┘
-                            │
-         DUT input/output   ▼
-                            ▼
-               ┌────────────────────────┐
-               │      adder_monitor     │──► 傳送到 scoreboard
-               └────────────┬───────────┘
-                            │
-                            ▼
-               ┌────────────────────────┐
-               │     adder_scoreboard   │◄── ref_model
-               └────────────────────────┘
-
-🧾 五、你這個專案展示的關鍵 UVM 概念
-概念	你範例中如何體現
-Factory 建構	使用 type_id::create() 在 build phase 建立所有元件
-TLM 通訊	monitor, ref_model 使用 analysis_port 對 scoreboard 傳資料
-Phase 控制	依序經過 build → connect → run → report
-自動驗證	scoreboard 自動比對 DUT vs REF 結果
-資料流整合	sequencer → driver → DUT → monitor → scoreboard 完整形成
+- Implement reference model with other languages (such as Python/C++)
+    - Most industrial refence model uses languages other than SystemVerilog for the algorithms for reusability, cross-platform, and connection to software team
+    - Use DPI-C or UVM FLI to connect to UVM environment
+- Add coverage and closure report
+    - Currently have the monitor and sequence, but missing the coverage component
+    - Should add cover group for input:
+        - `a` : 0 - 255
+        - `b` : 0 - 255
+        - Corner cases: `0x00`, `0xFF`, and overflow conditions
+    - Aim to achieve **100% coverage closure**

@@ -2,7 +2,6 @@
 
 ## Introduction
 
----
 
 - This project implements an 8-bit adder module that follows a valid/ready handshake protocol. It contains a complete UVM (Universal Verification Methodology) 1.2 verification environment.
 - The DUT (Design Under Test), implemented a simple 8-bit adder, contains four states, with handshake signals to verify functional correctness, timing behavior, and protocol compliance.
@@ -11,7 +10,7 @@
 
 ## DUT
 
----
+
 
 - **Functionality**
     - Handshake-based adder is simulated so that state transitions determine when it receives input and when it outputs data
@@ -31,7 +30,7 @@
 
 ## UVM Environment Overview
 
----
+
 
 - **UVM architecture diagram**
     
@@ -57,7 +56,7 @@
 
 ## UVM Execution Flow
 
----
+
 
 ### 1. Build phase
 
@@ -143,8 +142,6 @@
 
 ## Verification Results
 
----
-
 - Repeat five iterations, all passed without error, DUT results match with reference model perfectly
 - Outputs of one successful verification
     
@@ -158,8 +155,6 @@
 
 ## Conclusion
 
----
-
 - This project fully demonstrated:
     - Layered and structured verification using UVM.
     - Robust handshake protocol and synchronous logic.
@@ -167,9 +162,8 @@
     - A reusable and scalable verification environment architecture.
 - Verification results show that all the transaction match successfully, indicating that the verification environment is correctly designed and stable.
 
-### Future Work
 
----
+## Future Work
 
 - Implement reference model with other languages (such as Python/C++)
     - Most industrial refence model uses languages other than SystemVerilog for the algorithms for reusability, cross-platform, and connection to software team
